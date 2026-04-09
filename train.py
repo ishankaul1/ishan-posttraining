@@ -1,0 +1,49 @@
+"""
+Dispatcher: loads a YAML config and routes to the appropriate trainer.
+Usage: accelerate launch train.py --config configs/sft_qwen_1.5b.yaml
+"""
+
+import argparse
+import yaml
+
+
+def load_config(path: str) -> dict:
+    with open(path) as f:
+        return yaml.safe_load(f)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", required=True, help="Path to YAML config")
+    args, extra = parser.parse_known_args()
+
+    cfg = load_config(args.config)
+
+    # Extra CLI args override config values (--key=value or --key value)
+    i = 0
+    while i < len(extra):
+        key = extra[i].lstrip("-").replace("-", "_")
+        if "=" in key:
+            k, v = key.split("=", 1)
+            cfg[k] = v
+            i += 1
+        else:
+            cfg[key] = extra[i + 1]
+            i += 2
+
+    trainer_name = cfg.get("trainer")
+    if not trainer_name:
+        raise ValueError("Config must specify a 'trainer' field (e.g. trainer: sft)")
+
+    if trainer_name == "sft":
+        from trainers.sft import run
+    elif trainer_name == "grpo":
+        from trainers.grpo import run
+    else:
+        raise ValueError(f"Unknown trainer: {trainer_name!r}. Valid options: sft, grpo")
+
+    run(cfg)
+
+
+if __name__ == "__main__":
+    main()

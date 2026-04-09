@@ -1,0 +1,18 @@
+trainer: sft
+model: Qwen/Qwen2.5-1.5B-Instruct
+dataset: trl-lib/Capybara
+run_name: sft_qwen1.5b_capybara
+
+num_train_epochs: 1
+batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 2e-5
+warmup_ratio: 0.1
+lr_scheduler_type: cosine
+max_seq_length: 2048
+
+bf16: true
+logging_steps: 10
+save_steps: 100
+save_total_limit: 3
+report_to: wandb
