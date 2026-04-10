@@ -19,6 +19,8 @@ RUN apt-get update && apt-get install -y curl apt-transport-https gnupg && \
     apt-get update && apt-get install -y google-cloud-cli && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+ENV GCS_BUCKET="ai-experiments-479020"
+
 COPY . /app/
 
 ENTRYPOINT ["bash", "train.sh"]
