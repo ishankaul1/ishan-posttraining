@@ -8,7 +8,7 @@ usage() {
   echo ""
   echo "Required env vars:"
   echo "  GCS_BUCKET            - GCS bucket name for checkpoint sync"
-  echo "  GCS_KEY_B64           - Base64-encoded GCS service account JSON (from RunPod secret)"
+  echo "  GOOGLE_APPLICATION_CREDENTIALS_BASE64 - Base64-encoded GCS service account JSON (from RunPod secret)"
   echo "  WANDB_API_KEY         - Weights & Biases API key (from RunPod secret)"
   echo "  HF_TOKEN              - HuggingFace token for gated models (from RunPod secret)"
 }
@@ -32,13 +32,13 @@ fi
 
 # ── Credentials ──────────────────────────────────────────────────────────────
 
-if [[ -n "${GCS_KEY_B64:-}" ]]; then
+if [[ -n "${GOOGLE_APPLICATION_CREDENTIALS_BASE64:-}" ]]; then
   echo "[train.sh] Decoding GCS credentials..."
-  echo "$GCS_KEY_B64" | base64 -d > /tmp/gcs-key.json
+  echo "$GOOGLE_APPLICATION_CREDENTIALS_BASE64" | base64 -d > /tmp/gcs-key.json
   export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcs-key.json
   gcloud auth activate-service-account --key-file=/tmp/gcs-key.json --quiet
 else
-  echo "[train.sh] WARNING: GCS_KEY_B64 not set — checkpoint sync will be skipped"
+  echo "[train.sh] WARNING: GOOGLE_APPLICATION_CREDENTIALS_BASE64 not set — checkpoint sync will be skipped"
 fi
 
 # ── Experiment folder ─────────────────────────────────────────────────────────
@@ -55,7 +55,7 @@ echo "[train.sh] GCS path:    gs://${GCS_BUCKET:-<not set>}/${EXPERIMENT_FOLDER}
 
 # ── Background GCS sync ───────────────────────────────────────────────────────
 
-if [[ -n "${GCS_BUCKET:-}" && -n "${GCS_KEY_B64:-}" ]]; then
+if [[ -n "${GCS_BUCKET:-}" && -n "${GOOGLE_APPLICATION_CREDENTIALS_BASE64:-}" ]]; then
   echo "[train.sh] Starting background sync (every 5 min) to gs://${GCS_BUCKET}/${EXPERIMENT_FOLDER}"
   (
     while true; do
@@ -74,7 +74,7 @@ accelerate launch train.py --config "$CONFIG" "${EXTRA_ARGS[@]}"
 
 # ── Final sync ────────────────────────────────────────────────────────────────
 
-if [[ -n "${GCS_BUCKET:-}" && -n "${GCS_KEY_B64:-}" ]]; then
+if [[ -n "${GCS_BUCKET:-}" && -n "${GOOGLE_APPLICATION_CREDENTIALS_BASE64:-}" ]]; then
   echo "[train.sh] Training complete. Running final sync..."
   gcloud storage rsync "$OUTPUT_DIR" "gs://${GCS_BUCKET}/${EXPERIMENT_FOLDER}/" --recursive
   echo "[train.sh] Done. Checkpoints at gs://${GCS_BUCKET}/${EXPERIMENT_FOLDER}"

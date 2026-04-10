@@ -1,4 +1,4 @@
-from rewards.math import exact_match
+from rewards.exact import exact_match
 
 REGISTRY = {
     "exact_match": exact_match,
