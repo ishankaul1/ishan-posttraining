@@ -6,10 +6,26 @@ Usage: accelerate launch train.py --config configs/sft_qwen_1.5b.yaml
 import argparse
 import yaml
 
+# Fields that must be specific types regardless of how YAML parses them
+# (YAML parses scientific notation like 2e-5 as a string)
+_FLOAT_FIELDS = {"learning_rate", "warmup_ratio", "weight_decay", "adam_epsilon", "max_grad_norm"}
+_INT_FIELDS = {
+    "num_train_epochs", "batch_size", "gradient_accumulation_steps", "logging_steps",
+    "save_steps", "save_total_limit", "max_steps", "max_length",
+    "num_generations", "max_completion_length",
+}
+
 
 def load_config(path: str) -> dict:
     with open(path) as f:
-        return yaml.safe_load(f)
+        cfg = yaml.safe_load(f)
+    for key in _FLOAT_FIELDS:
+        if key in cfg:
+            cfg[key] = float(cfg[key])
+    for key in _INT_FIELDS:
+        if key in cfg:
+            cfg[key] = int(cfg[key])
+    return cfg
 
 
 def main():

@@ -27,8 +27,8 @@ def run(cfg: dict):
         save_total_limit=cfg.get("save_total_limit", 3),
         report_to=cfg.get("report_to", "wandb"),
         run_name=cfg.get("run_name", None),
+        max_steps=cfg.get("max_steps", -1),
         num_generations=cfg.get("num_generations", 8),
-        max_prompt_length=cfg.get("max_prompt_length", 512),
         max_completion_length=cfg.get("max_completion_length", 512),
     )
 
@@ -37,7 +37,11 @@ def run(cfg: dict):
     tokenizer = AutoTokenizer.from_pretrained(cfg["model"])
 
     logger.info(f"Loading dataset: {cfg['dataset']}")
-    dataset = load_dataset(cfg["dataset"])
+    dataset = load_dataset(cfg["dataset"], cfg.get("dataset_config", None))
+
+    for old, new in cfg.get("column_mapping", {}).items():
+        logger.info(f"Renaming column '{old}' → '{new}'")
+        dataset = dataset.rename_column(old, new)
 
     trainer = GRPOTrainer(
         model=model,

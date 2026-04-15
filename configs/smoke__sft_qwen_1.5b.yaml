@@ -1,0 +1,15 @@
+trainer: sft
+model: Qwen/Qwen2.5-1.5B-Instruct
+dataset: trl-lib/Capybara
+run_name: smoke__sft_qwen1.5b
+
+max_steps: 2
+batch_size: 4
+gradient_accumulation_steps: 1
+learning_rate: 2e-5
+max_length: 512
+
+bf16: false
+logging_steps: 1
+save_steps: 999999
+report_to: none

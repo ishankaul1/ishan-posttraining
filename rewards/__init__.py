@@ -1,7 +1,9 @@
 from rewards.exact import exact_match
+from trl.rewards import accuracy_reward
 
 REGISTRY = {
     "exact_match": exact_match,
+    "accuracy_reward": accuracy_reward,  # TRL built-in: checks boxed math answers
 }
 
 

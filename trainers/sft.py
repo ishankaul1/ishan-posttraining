@@ -22,7 +22,8 @@ def run(cfg: dict):
         save_total_limit=cfg.get("save_total_limit", 3),
         report_to=cfg.get("report_to", "wandb"),
         run_name=cfg.get("run_name", None),
-        max_seq_length=cfg.get("max_seq_length", 2048),
+        max_steps=cfg.get("max_steps", -1),
+        max_length=cfg.get("max_length", 2048),
     )
 
     logger.info("Loading model and tokenizer...")

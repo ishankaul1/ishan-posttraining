@@ -9,7 +9,7 @@ gradient_accumulation_steps: 4
 learning_rate: 2e-5
 warmup_ratio: 0.1
 lr_scheduler_type: cosine
-max_seq_length: 2048
+max_length: 2048
 
 bf16: true
 logging_steps: 10

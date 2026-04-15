@@ -1,6 +1,7 @@
 trainer: grpo
 model: Qwen/Qwen2.5-1.5B-Instruct
 dataset: openai/gsm8k
+dataset_config: main
 run_name: grpo_qwen1.5b_gsm8k
 
 num_train_epochs: 1
@@ -11,7 +12,6 @@ warmup_ratio: 0.1
 lr_scheduler_type: cosine
 
 num_generations: 8
-max_prompt_length: 512
 max_completion_length: 512
 
 bf16: true
@@ -19,6 +19,12 @@ logging_steps: 10
 save_steps: 100
 save_total_limit: 3
 report_to: wandb
+
+# Map dataset columns to the names GRPOTrainer and reward functions expect.
+# GRPOTrainer requires 'prompt'; reward functions require whatever their named args are (e.g. 'solution').
+column_mapping:
+  question: prompt
+  answer: solution
 
 reward_functions:
   - exact_match

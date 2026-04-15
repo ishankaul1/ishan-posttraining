@@ -50,7 +50,9 @@ echo "  Name:     $NAME"
 runpodctl create pod \
   --name "$NAME" \
   --templateId "$TEMPLATE_ID" \
+  --imageName "dockerish999/ishan_posttraining:latest" \
   --gpuType "$GPU" \
+  --secureCloud \
   --args "--config $CONFIG"
 
 echo "[run_experiment.sh] Pod launched."
